@@ -1,0 +1,50 @@
+<?php
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function responsive_svg_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the expanded_menu_block module.
+    case 'help.page.responsive_svg':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Provides a twig filter for rendering SVG stacks with cross-browser responsive resizing.') . '</p>';
+      $output .= '<h3>' . t('Usage') . '</h3>';
+      $output .= '<code>{{ \'stack-name#symbol-id\' | responsiveSVG(options) }}</code>';
+      $output .= '<h4>' . t('Options') . '</h4>';
+      $output .= '<p>' . t('All options are optional.') . '</p>';
+      $output .= '<dl>';
+      $output .= '<dt>class</dt>';
+      $output .= '<dd>Set the value for the class attribute of the SVG element</dd>';
+      $output .= '<dt>width</dt>';
+      $output .= '<dd>Width of the SVG. If not supplied, the value from the viewBox attribute of the SVG element is used.</dd>';
+      $output .= '<dt>height</dt>';
+      $output .= '<dd>Height of the SVG. If not supplied, the value from the viewBox attribute of the SVG element is used.</dd>';
+      $output .= '<dt>offsetX</dt>';
+      $output .= '<dd>Extra width to adjust the aspect ratio of the SVG.</dd>';
+      $output .= '<dt>offsetY</dt>';
+      $output .= '<dd>Extra height to adjust the aspect ratio of the SVG.</dd>';
+      $output .= '</dl>';
+      $output .= '<h3>' . t('Using inline SVGs to avoid IE polyfill.') . '</h3>';
+      $output .= '<code>{{ \'stack-name\' | responsiveSourceSVG }}</code>';
+
+      return $output;
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function responsive_svg_theme() {
+  return array(
+    'responsive_svg' => array(
+      'variables' => array(
+        'svg' => 'iconstack',
+        'options' => [],
+      ),
+    ),
+  );
+}

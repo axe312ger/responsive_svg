@@ -1,0 +1,5 @@
+responsive_svg.configuration_form:
+  title: 'Responsive SVG configuration'
+  description: 'Configure the path mappings.'
+  parent: system.admin_config_media
+  route_name: responsive_svg.configuration_form

@@ -1,0 +1,5 @@
+services:
+  twig.extension.responsive_svg:
+    class: Drupal\responsive_svg\ResponsiveSvgTwigExtension
+    tags:
+      - { name: twig.extension }
