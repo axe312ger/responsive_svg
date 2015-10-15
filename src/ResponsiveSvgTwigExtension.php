@@ -141,9 +141,17 @@ class ResponsiveSvgTwigExtension extends \Twig_Extension
       $svg = $dom->createElement('svg');
       $svg->setAttribute('viewBox', '0 0 ' . $width . ' ' . $height);
 
-      $use = $dom->createElement('use');
-      $use->setAttribute('xlink:href', $href);
-      $svg->appendChild($use);
+      if (isset($mappings[$path]['method']) && $mappings[$path]['method'] == 'inline') {
+        // Inline SVG.
+        $content = $dom->createDocumentFragment();
+        $content->appendXML($item->html());
+        $svg->appendChild($content);
+      } else {
+        // Linked SVG.
+        $use = $dom->createElement('use');
+        $use->setAttribute('xlink:href', $href);
+        $svg->appendChild($use);
+      }
     } else {
       $svg = $dom->createElement('object');
       $svg->setAttribute('type', 'image/svg+xml');
