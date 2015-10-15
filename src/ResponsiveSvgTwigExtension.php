@@ -16,7 +16,7 @@ class ResponsiveSvgTwigExtension extends \Twig_Extension
   }
 
   private function resolvePath($path) {
-    $module_config = \Drupal::config('responsive_svg.configuration');
+    $module_config = \Drupal::config('responsive_svg.config');
     $mappings = $module_config->get('mappings');
 
     // Resolve mappings when no filename is given.
@@ -68,7 +68,7 @@ class ResponsiveSvgTwigExtension extends \Twig_Extension
 
     list($path, $identifier) = explode('#', $uri);
 
-    $module_config = \Drupal::config('responsive_svg.configuration');
+    $module_config = \Drupal::config('responsive_svg.config');
     $mappings = $module_config->get('mappings');
 
     $pathResolved = $this->resolvePath($path);
@@ -85,7 +85,7 @@ class ResponsiveSvgTwigExtension extends \Twig_Extension
     // Parse svg file and read viewBox attribute.
     $svg = $this->loadContent($pathResolved);
     if ($svg === false) {
-      drupal_set_message('Cannot find svg ' . $uri);
+      drupal_set_message('Cannot find SVG ' . $uri);
       return '';
     }
 
