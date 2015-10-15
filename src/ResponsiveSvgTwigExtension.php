@@ -16,7 +16,7 @@ class ResponsiveSvgTwigExtension extends \Twig_Extension
   }
 
   private function resolvePath($path) {
-    $module_config = \Drupal::config('responsive_svg.configuration');
+    $module_config = \Drupal::config('responsive_svg.config');
     $mappings = $module_config->get('mappings');
 
     // Resolve mappings when no filename is given.
@@ -68,7 +68,7 @@ class ResponsiveSvgTwigExtension extends \Twig_Extension
 
     list($path, $identifier) = explode('#', $uri);
 
-    $module_config = \Drupal::config('responsive_svg.configuration');
+    $module_config = \Drupal::config('responsive_svg.config');
     $mappings = $module_config->get('mappings');
 
     $pathResolved = $this->resolvePath($path);
@@ -85,7 +85,7 @@ class ResponsiveSvgTwigExtension extends \Twig_Extension
     // Parse svg file and read viewBox attribute.
     $svg = $this->loadContent($pathResolved);
     if ($svg === false) {
-      drupal_set_message('Cannot find svg ' . $uri);
+      drupal_set_message('Cannot find SVG ' . $uri);
       return '';
     }
 
@@ -98,7 +98,7 @@ class ResponsiveSvgTwigExtension extends \Twig_Extension
     }
 
     if (!$item->count()) {
-      drupal_set_message('Cannot find svg element for ' . $uri);
+      drupal_set_message('Cannot find SVG element for ' . $uri);
       return '';
     }
 
@@ -141,9 +141,17 @@ class ResponsiveSvgTwigExtension extends \Twig_Extension
       $svg = $dom->createElement('svg');
       $svg->setAttribute('viewBox', '0 0 ' . $width . ' ' . $height);
 
-      $use = $dom->createElement('use');
-      $use->setAttribute('xlink:href', $href);
-      $svg->appendChild($use);
+      if (isset($mappings[$path]['method']) && $mappings[$path]['method'] == 'inline') {
+        // Inline SVG.
+        $content = $dom->createDocumentFragment();
+        $content->appendXML($item->html());
+        $svg->appendChild($content);
+      } else {
+        // Linked SVG.
+        $use = $dom->createElement('use');
+        $use->setAttribute('xlink:href', $href);
+        $svg->appendChild($use);
+      }
     } else {
       $svg = $dom->createElement('object');
       $svg->setAttribute('type', 'image/svg+xml');

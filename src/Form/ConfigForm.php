@@ -7,22 +7,25 @@
 
 namespace Drupal\responsive_svg\Form;
 
+use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
+use Drupal\Component\Serialization\Yaml;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Symfony\Cmf\Component\Routing\ContentAwareGenerator;
 
 /**
  * Class ConfigurationForm.
  *
  * @package Drupal\responsive_svg\Form
  */
-class ConfigurationForm extends ConfigFormBase {
+class ConfigForm extends ConfigFormBase {
 
   /**
    * {@inheritdoc}
    */
   protected function getEditableConfigNames() {
     return [
-      'responsive_svg.configuration'
+      'responsive_svg.config'
     ];
   }
 
@@ -30,25 +33,39 @@ class ConfigurationForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function getFormId() {
-    return 'configuration_form';
+    return 'responsive_svg_config';
   }
 
   /**
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $config = $this->config('responsive_svg.configuration');
+    $config = $this->config('responsive_svg.config');
+    $conf = $config->get();
+    $config_text = Yaml::encode($conf);
 
-    $mappings = $config->get('mappings');
-    $mappings_text = $this->getMappingsText($mappings);
-
-    $form['mappings'] = array(
+    $form['config'] = array(
       '#type' => 'textarea',
-      '#title' => $this->t('SVG mapping'),
-      '#description' => $this->t('Use this field to store mappings to your svg files. Use "name|path" as pattern. E.g. "iconstack|@mythemeName/images/iconstack.svg"')
-        . '<br/>' . $this->t('Optionally you can add a third parameter "name|path|replacement" to alter the svg link url. Useful for linking of inline svgs or from CDN.'),
-      '#default_value' => $mappings_text,
+      '#title' => $this->t('Configuration'),
+      '#default_value' => $config_text,
     );
+
+    $form['example'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Example structure'),
+    ];
+    $form['example']['description'] = [
+      '#prefix' => '<p>',
+      '#suffix' => '</p>',
+      '#markup' => $this->t('Each SVG file name has a path. Use <code>@theme_name</code> for referring to a theme.')
+    ];
+    $form['example']['code'] = [
+      '#prefix' => '<pre>',
+      '#suffix' => '</pre>',
+      '#markup' => "mappings:
+  logo:
+    path: '@bartik/logo.svg'",
+    ];
 
     return parent::buildForm($form, $form_state);
   }
@@ -57,6 +74,14 @@ class ConfigurationForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
+    $config_text = $form_state->getValue('config') ?: 'mappings:';
+    try {
+      $form_state->set('config', Yaml::decode($config_text));
+    }
+    catch (InvalidDataTypeException $e) {
+      $form_state->setErrorByName('config', $e->getMessage());
+    }
+
     parent::validateForm($form, $form_state);
   }
 
@@ -64,13 +89,12 @@ class ConfigurationForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    parent::submitForm($form, $form_state);
-
-    $mappings = $this->getConfigurationArray($form_state->getValue('mappings'));
-
-    $this->config('responsive_svg.configuration')
-      ->set('mappings', $mappings)
+    $config = $form_state->get('config');
+    $this->config('responsive_svg.config')
+      ->setData($config)
       ->save();
+
+    parent::submitForm($form, $form_state);
   }
 
   /**
