@@ -1,9 +1,7 @@
-
-responsive_svg.configuration_form:
+responsive_svg.config:
   path: '/admin/config/responsive_svg/configuration'
   defaults:
-    _form: '\Drupal\responsive_svg\Form\ConfigurationForm'
-    _title: 'ConfigurationForm'
+    _form: '\Drupal\responsive_svg\Form\ConfigForm'
+    _title: 'Responsive SVG'
   requirements:
     _permission: 'access administration pages'
-

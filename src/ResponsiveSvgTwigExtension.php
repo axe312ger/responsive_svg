@@ -98,7 +98,7 @@ class ResponsiveSvgTwigExtension extends \Twig_Extension
     }
 
     if (!$item->count()) {
-      drupal_set_message('Cannot find svg element for ' . $uri);
+      drupal_set_message('Cannot find SVG element for ' . $uri);
       return '';
     }
 
