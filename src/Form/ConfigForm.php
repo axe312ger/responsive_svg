@@ -48,6 +48,7 @@ class ConfigForm extends ConfigFormBase {
       '#type' => 'textarea',
       '#title' => $this->t('Configuration'),
       '#default_value' => $config_text,
+      '#attributes' => ['data-yaml-editor' => 'true'],
     );
 
     $form['example'] = [
