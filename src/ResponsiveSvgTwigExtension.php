@@ -73,7 +73,7 @@ class ResponsiveSvgTwigExtension extends \Twig_Extension
 
     $pathResolved = $this->resolvePath($path);
 
-    if (!empty($mappings[$path]['replacement'])) {
+    if (isset($mappings[$path]) && ($mappings[$path]['replacement'] !== NULL)) {
       $href = $mappings[$path]['replacement'];
     } else {
       $href = '/' . $pathResolved;
